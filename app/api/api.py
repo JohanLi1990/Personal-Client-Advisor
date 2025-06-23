@@ -2,7 +2,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from app.core.services.chat_service import ChatService
-from app.core.llm.agents import get_agent
+from app.core.llm.agents import get_agent, get_agnos_agent
 
 router = APIRouter()
 
@@ -15,11 +15,13 @@ class ChatResponse(BaseModel):
 @router.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(
     request: ChatRequest,
-    agent=Depends(get_agent)
+    agent=Depends(get_agent),
+    agnos_agenet = Depends(get_agnos_agent)
 ):
     try:
-        chat_service = ChatService(agent)
+        chat_service = ChatService(agent, agnos_agenet)
         response = await chat_service.chat(request.message)
         return ChatResponse(response=response)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
